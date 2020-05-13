@@ -1,0 +1,34 @@
+main: si.lilbunnyrabbit.lilbot.lilBot
+name: lilBot
+version: 1.0
+authors:
+  - lilBunnyRabbit
+description: Testing plugin
+commands:
+  playerdata:
+    description: Send player data
+    usage: /playerdata
+  home:
+    description: Tp to bed
+    usage: /home
+  spawn:
+    description: Tp to spawn
+    usage: /spawn
+  summonparticle:
+    description: summon particle
+    usage: /summonparticle
+  tpa:
+    description: summon to player
+    usage: /tpa <username>
+  tpaccept:
+    description: accept teleport
+    usage: /tpaccept <username>
+  tpdeny:
+    description: deny teleport
+    usage: /tpdeny <username>
+  inventory:
+    description: show players inventory
+    usage: /inventory <username>
+  echest:
+    description: accesss you ender chest
+    usage: /echest
