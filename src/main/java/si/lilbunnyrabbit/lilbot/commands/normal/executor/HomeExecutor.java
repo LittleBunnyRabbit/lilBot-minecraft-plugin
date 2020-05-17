@@ -1,4 +1,4 @@
-package si.lilbunnyrabbit.lilbot.commands.executor;
+package si.lilbunnyrabbit.lilbot.commands.normal.executor;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -9,10 +9,10 @@ import org.bukkit.entity.Player;
 import si.lilbunnyrabbit.lilbot.lilBot;
 import si.lilbunnyrabbit.lilbot.utils.Utils;
 
-public class SpawnExecutor implements CommandExecutor {
+public class HomeExecutor implements CommandExecutor {
     private lilBot plugin;
 
-    public SpawnExecutor(lilBot plugin) {
+    public HomeExecutor(lilBot plugin) {
         this.plugin = plugin;
     }
 
@@ -20,11 +20,16 @@ public class SpawnExecutor implements CommandExecutor {
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         Player player = (Player) sender;
         if(!Utils.canTeleport(player)) return true;
-        Location spawn_location = player.getWorld().getSpawnLocation();
+        Location bed_location = player.getBedSpawnLocation();
 
-        Utils.sendToPlayer(player, ChatColor.AQUA + "Teleporting to spawn!");
-        Utils.teleportPlayer(player, spawn_location, plugin);
-        Utils.broadcast(String.format("%s teleported to spawn!", player.getDisplayName()));
+        if(bed_location == null) {
+            Utils.sendToPlayer(player, ChatColor.RED + "Missing bed!");
+            return true;
+        }
+
+        Utils.sendToPlayer(player, ChatColor.AQUA + "Teleporting you to your bed!");
+        Utils.teleportPlayer(player, bed_location, plugin);
+
         return true;
     }
 }

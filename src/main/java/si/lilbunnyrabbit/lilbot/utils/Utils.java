@@ -1,23 +1,34 @@
 package si.lilbunnyrabbit.lilbot.utils;
 
+import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.entities.TextChannel;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import si.lilbunnyrabbit.lilbot.lilBot;
+
 import java.util.concurrent.TimeUnit;
 
 public class Utils {
 
     public static void sendLog(String message) {
-        System.out.println("[My plugin] " + message);
+        System.out.println("[lilBot] " + message);
     }
 
-    public static void broadcast(String message) {
-        Bukkit.broadcastMessage(ChatColor.GREEN + "[lilBot]: " + ChatColor.WHITE + message);
+    public static void sendToMinecraft(String username, String message) {
+        Bukkit.broadcastMessage(ChatColor.GREEN + "[" + username + "]: " + ChatColor.WHITE + message);
     }
 
     public static void sendToPlayer(Player player, String message) {
         player.sendMessage(ChatColor.GREEN + "[lilBot]: " + ChatColor.WHITE + message);
+    }
+
+    public static void sendToPlayer(Player player, TextComponent message) {
+        TextComponent full_message = new TextComponent( "[lilBot]: " );
+        full_message.setColor( net.md_5.bungee.api.ChatColor.GREEN );
+        full_message.addExtra(message);
+        player.spigot().sendMessage(full_message);
     }
 
     public static boolean canTeleport(Player player) {
@@ -31,47 +42,30 @@ public class Utils {
         return false;
     }
 
-    public static void runTeleportAnimation(Player player, Location tp_location) {
-        Location player_location = player.getLocation();
+    private static void teleportAnimation(Location location) {
+        Location tp_location = location.clone();
         double r = 0.5;
         int steps = 8;
-        double y_steps = -0.01;
-        int height_offset = 2;
-
-        double pl_a = player_location.getX();
-        double pl_b = player_location.getZ();
-        double pl_y = player_location.getY();
+        double y_steps = 0.01;
 
         double tp_a = tp_location.getX();
         double tp_b = tp_location.getZ();
 
-        player_location.setY(pl_y + height_offset);
+        World world = tp_location.getWorld();
 
-        World world = player.getWorld();
 
         for (int i = 0; i < 360 * 4; i += steps) {
             double radians = Math.toRadians(i);
 
-            player_location.setX(pl_a + r * Math.sin(radians));
-            player_location.setZ(pl_b + r * Math.cos(radians));
-
             tp_location.setX(tp_a + r * Math.sin(radians));
             tp_location.setZ(tp_b + r * Math.cos(radians));
 
-            double y = player_location.getY();
-            if(y + y_steps > pl_y + height_offset || y + y_steps < pl_y) y_steps *= -1;
+            tp_location.setY(tp_location.getY() + y_steps);
 
-            player_location.setY(y + y_steps);
-            tp_location.setY(tp_location.getY() - y_steps);
-
-            world.spawnParticle(Particle.DRAGON_BREATH, player_location, 1, 0, 0, 0, 0);
             world.spawnParticle(Particle.DRAGON_BREATH, tp_location, 1, 0, 0, 0, 0);
 
-            try {
-                TimeUnit.MILLISECONDS.sleep(25);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            try { TimeUnit.MILLISECONDS.sleep(25); }
+            catch (InterruptedException e) { e.printStackTrace(); }
         }
     }
 
@@ -80,10 +74,33 @@ public class Utils {
 
             @Override
             public void run() {
-                runTeleportAnimation(player, tp_location);
+                teleportAnimation(tp_location);
                 player.getWorld().strikeLightningEffect(tp_location);
                 player.teleport(tp_location);
             }
         }.runTaskLater(plugin, 0);
+    }
+
+    public static void sendToDiscord(JDA jda, String channel_id, String message) {
+        if(channel_id != null) {
+            TextChannel minecraft_channel = jda.getTextChannelById(channel_id);
+            if(minecraft_channel != null) {
+                minecraft_channel.sendMessage(message).queue();
+            }
+        }
+    }
+
+    public static void updateDiscordChannelName(JDA jda, String channel_id, String name) {
+        TextChannel minecraft_channel = jda.getTextChannelById(channel_id);
+        if(minecraft_channel != null) {
+            minecraft_channel.getManager().setName(name).queue();
+        }
+    }
+
+    public static void updatePlayerCount(JDA jda, String channel_id, int difference) {
+        int players_count = Bukkit.getOnlinePlayers().size() - difference;
+        updateDiscordChannelName(jda, channel_id,
+                String.format("\uD83D\uDFE2-%d-%s", players_count, players_count == 1 ? "player" : "players")
+        );
     }
 }

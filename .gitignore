@@ -1,3 +1,6 @@
 .gradle/
 .idea/
 build/
+src/main/resources/config.yml
+
+src/main/resources/config.yml.potate

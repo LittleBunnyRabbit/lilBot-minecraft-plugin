@@ -3,32 +3,32 @@ name: lilBot
 version: 1.0
 authors:
   - lilBunnyRabbit
-description: Testing plugin
+description: lilBot plugin
 commands:
-  playerdata:
-    description: Send player data
-    usage: /playerdata
   home:
-    description: Tp to bed
+    description: Teleport to your bed
     usage: /home
   spawn:
-    description: Tp to spawn
+    description: Teleport to spawn
     usage: /spawn
-  summonparticle:
-    description: summon particle
-    usage: /summonparticle
   tpa:
-    description: summon to player
+    description: Teleport to player
     usage: /tpa <username>
   tpaccept:
-    description: accept teleport
-    usage: /tpaccept <username>
+    description: Accept teleport from player
+    usage: /tpaccept
   tpdeny:
-    description: deny teleport
-    usage: /tpdeny <username>
+    description: Deny teleport from player
+    usage: /tpdeny
   inventory:
-    description: show players inventory
+    description: Show players inventory
     usage: /inventory <username>
   echest:
-    description: accesss you ender chest
+    description: Open your ender chest
     usage: /echest
+  vanish:
+    description: Hide from online players
+    usage: /vanish
+  uncover:
+    description: Show yourself if you were hiding
+    usage: /uncover
