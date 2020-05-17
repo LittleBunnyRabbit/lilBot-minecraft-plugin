@@ -1,27 +1,23 @@
-package si.lilbunnyrabbit.lilbot.commands.executor.tpa;
+package si.lilbunnyrabbit.lilbot.commands.normal.executor.tpa;
 
 import net.md_5.bungee.api.chat.ClickEvent;
-import net.md_5.bungee.api.chat.ComponentBuilder;
-import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import si.lilbunnyrabbit.lilbot.utils.Utils;
+import si.lilbunnyrabbit.lilbot.utils.teleport.TeleportStorage;
 
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.UUID;
 
 public class TpaExecutor implements CommandExecutor {
-    private HashMap<UUID, UUID[]> tp_requests;
+    private TeleportStorage tp_storage;
 
-    public TpaExecutor(HashMap<UUID, UUID[]> tp_requests) {
-        this.tp_requests = tp_requests;
+    public TpaExecutor(TeleportStorage tp_storage) {
+        this.tp_storage = tp_storage;
     }
 
     @Override
@@ -41,24 +37,35 @@ public class TpaExecutor implements CommandExecutor {
             return true;
         }
 
-//        UUID[] player_requests = tp_requests.containsKey(tp_player.getUniqueId()) ? tp_requests.get(tp_player.getUniqueId()) : new UUID[1];
-//
-//        if(Arrays.stream(player_requests).anyMatch(player.getUniqueId()::equals)) {
-//            Utils.sendToPlayer(player, ChatColor.RED + "You already requested that...");
-//            return true;
-//        }
+        UUID player_id = player.getUniqueId();
+        UUID tp_player_id = tp_player.getUniqueId();
 
-        Location tp_player_location = tp_player.getLocation();
+        boolean isAdded = tp_storage.getRequests(tp_player_id).addRequest(player_id);
 
-        Utils.sendToPlayer(player, String.format(
-                "%sTeleporting to %s%s",
-                ChatColor.AQUA, ChatColor.DARK_PURPLE, tp_player.getDisplayName()
-        ));
-        player.teleport(tp_player_location);
-        TextComponent message = new TextComponent( "[Accept]" );
-        message.setClickEvent( new ClickEvent( ClickEvent.Action.RUN_COMMAND,  "/help") );
-        message.setHoverEvent( new HoverEvent( HoverEvent.Action.SHOW_TEXT, new ComponentBuilder( "Visit the Spigot website!" ).create() ) );
-        tp_player.spigot().sendMessage(message);
+        if(!isAdded) {
+            Utils.sendToPlayer(player, ChatColor.RED + "You have already requested to teleport to " + ChatColor.DARK_PURPLE + tp_player_name);
+            return true;
+        }
+
+        String player_name = player.getName();
+
+        TextComponent tp_request_message = new TextComponent(String.format("%s%s%s wants to teleport to you!\n", ChatColor.DARK_PURPLE, player_name, ChatColor.AQUA));
+
+        TextComponent message_accept = new TextComponent( "[Accept]" );
+        message_accept.setClickEvent( new ClickEvent( ClickEvent.Action.RUN_COMMAND,  "/tpaccept " + player_name));
+        message_accept.setColor( net.md_5.bungee.api.ChatColor.GREEN );
+        message_accept.setBold( true );
+
+        TextComponent message_deny = new TextComponent( "[Deny]" );
+        message_deny.setClickEvent( new ClickEvent( ClickEvent.Action.RUN_COMMAND,  "/tpdeny " + player_name));
+        message_deny.setColor( net.md_5.bungee.api.ChatColor.RED );
+        message_deny.setBold( true );
+
+        tp_request_message.addExtra(message_accept);
+        tp_request_message.addExtra(" ");
+        tp_request_message.addExtra(message_deny);
+
+        Utils.sendToPlayer(tp_player, tp_request_message);
         return true;
     }
 }

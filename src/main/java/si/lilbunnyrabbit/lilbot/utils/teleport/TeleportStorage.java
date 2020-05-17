@@ -1,16 +1,20 @@
-package si.lilbunnyrabbit.lilbot.utils;
+package si.lilbunnyrabbit.lilbot.utils.teleport;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.UUID;
 
-public class TeleportRequests {
-    private HashMap<UUID, Arra> tp_requests;
+public class TeleportStorage {
+    private HashMap<UUID, TeleportRequests> tp_request_players;
 
-    public TeleportRequests() {
-        this.tp_requests = new ArrayList<>();
+    public TeleportStorage() {
+        this.tp_request_players = new HashMap<>();
     }
 
-    public addRequest(UUID player_id,)
+    public TeleportRequests getRequests(UUID player_id) {
+        if(!tp_request_players.containsKey(player_id)) {
+            tp_request_players.put(player_id, new TeleportRequests());
+        }
+
+        return tp_request_players.get(player_id);
+    }
 }
