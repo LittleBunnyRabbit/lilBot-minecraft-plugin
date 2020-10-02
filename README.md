@@ -1,4 +1,4 @@
-Minecraft plugin that connects discord chat with minecraft and some additional admin commands. 
+Minecraft plugin that connects discord chat with minecraft and some additional admin commands.   
 Commands:
   - home
   - spawn
